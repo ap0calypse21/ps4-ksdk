@@ -762,6 +762,47 @@ void init_1100sdk(uint8_t* kbase) {
     sysents = (void*)(kbase + 0x1101760);
 }
 
+void init_1300sdk(uint8_t* kbase) {
+    Xfast_syscall = (void*)(kbase + 0x1C0);
+    copyout = (void*)(kbase + 0x2BD5E0);
+    printf = (void*)(kbase + 0x2E0440);
+    malloc = (void*)(kbase + 0x9520);
+    free = (void*)(kbase + 0x96E0);
+    memcpy = (void*)(kbase + 0x2BD4E0);
+    memset = (void*)(kbase + 0x1FA1A0);
+    memcmp = (void*)(kbase + 0x394300);
+    kmem_alloc = (void*)(kbase + 0x465A40);
+    strlen = (void*)(kbase + 0x36AB90);
+    create_thread = (void*)(kbase + 0x4C6C0);
+    kern_reboot = (void*)(kbase + 0x3A1DD0);
+    vm_map_lock_read = (void*)(kbase + 0x2F7110);
+    vm_map_lookup_entry = (void*)(kbase + 0x2F7750);
+    vm_map_unlock_read = (void*)(kbase + 0x2F7160);
+    vm_map_delete = (void*)(kbase + 0x2F9C10);
+    vm_map_protect = (void*)(kbase + 0x2FBF70);
+    vm_map_findspace = (void*)(kbase + 0x2FA1D0);
+    vm_map_insert = (void*)(kbase + 0x2F8310);
+    vm_map_lock = (void*)(kbase + 0x2F6FC0);
+    vm_map_unlock = (void*)(kbase + 0x2F7030);
+    proc_rwmem = (void*)(kbase + 0x366000);
+    disable_console_output = (void*)(kbase + 0x1A47F40);
+    M_TEMP = (void*)(kbase + 0x1520D00);
+    kernel_map = (void*)(kbase + 0x22D1D50);
+    prison0 = (void*)(kbase + 0x111FA18);
+    rootvnode = (void*)(kbase + 0x2136E90);
+    allproc = (void*)(kbase + 0x1B28538);
+    sysents = (void*)(kbase + 0x1102B70);
+
+    // Not mapped for 13.00 yet, and left NULL on purpose so a wrong address can
+    // never be called: copyin, vprintf, strcpy, strncmp, pause, kthread_add,
+    // kthread_exit, sched_prio, sched_add, kern_yield, fill_regs, set_regs,
+    // kproc_create, kthread_set_affinity, kthread_suspend_check,
+    // kproc_kthread_add, sx_init_flags, sx_xlock, sx_xunlock, mtx_init,
+    // mtx_lock_spin_flags, mtx_unlock_spin_flags, mtx_lock_sleep,
+    // mtx_unlock_sleep, vmspace_acquire_ref, vmspace_free.
+    // WebRTE does not reference any of them.
+}
+
 void init_ksdk() {
     uint64_t kbase = get_kbase();
     cachedKernelBase = kbase;
@@ -841,6 +882,9 @@ void init_ksdk() {
         break;
     case 1100:
         init_1100sdk((uint8_t*)kbase);
+        break;
+    case 1300:
+        init_1300sdk((uint8_t*)kbase);
         break;
     }
 }

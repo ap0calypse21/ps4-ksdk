@@ -43,6 +43,7 @@ unsigned short kget_firmware_from_base(uint64_t kernbase) {
     char *fw1070 = (char *)(kernbase + 0x79E4D8);
     char *fw1071 = (char *)(kernbase + 0x79E4D8);
     char *fw1100 = (char *)(kernbase + 0x8011AE);
+    char *fw1300 = (char *)(kernbase + 0x7EB57E);
 
     if (streq(fw0505, firmwareString)) {
         cachedFirmware = 505;
@@ -167,6 +168,11 @@ unsigned short kget_firmware_from_base(uint64_t kernbase) {
 	if (streq(fw1100, firmwareString)) {
         cachedFirmware = 1100;
         return 1100;
+    }
+
+    if (streq(fw1300, firmwareString)) {
+        cachedFirmware = 1300;
+        return 1300;
     }
 
     return 0;
