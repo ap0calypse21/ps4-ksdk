@@ -57,6 +57,9 @@ void** kernel_map;
 void** prison0;
 void** rootvnode;
 void** allproc;
+struct sx *allproc_lock;
+void(*sx_slock)(struct sx *sx, int opts);
+void(*sx_sunlock)(struct sx *sx);
 struct sysent* sysents;
 
 uint64_t get_kbase() {
@@ -801,6 +804,13 @@ void init_1300sdk(uint8_t* kbase) {
     // mtx_lock_spin_flags, mtx_unlock_spin_flags, mtx_lock_sleep,
     // mtx_unlock_sleep, vmspace_acquire_ref, vmspace_free.
     // WebRTE does not reference any of them.
+
+    // Verified against the running console: the sx at +0x1B284D8 has lo_name
+    // pointing at the string "allproc", and a manual walk of +0x1B28538
+    // returned the same 63 processes that /list reports.
+    allproc_lock = (void*)(kbase + 0x1B284D8);
+    sx_slock     = (void*)(kbase + 0xA3660);
+    sx_sunlock   = (void*)(kbase + 0xA3950);
 }
 
 void init_ksdk() {

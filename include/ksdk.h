@@ -42,6 +42,11 @@ extern void(*kthread_suspend_check)(void);
 extern int(*kproc_kthread_add)(void (*func)(void *), void *arg, struct proc **procptr, struct thread **tdptr, int flags, int pages, char *procname, const char *fmt, ...);
 extern void(*sx_init_flags)(struct sx *sx, const char *description, int opts);
 extern void(*sx_xlock)(struct sx *sx);
+// Shared acquire/release. _sx_slock takes (sx, opts) and _sx_sunlock (sx);
+// confirmed from the 13.00 disassembly, where both operate on sx_lock at
+// offset 0x18 -- the same offset a live read of allproc_lock showed.
+extern void(*sx_slock)(struct sx *sx, int opts);
+extern void(*sx_sunlock)(struct sx *sx);
 extern void(*sx_xunlock)(struct sx *sx);
 extern void(*mtx_init)(struct mtx *mutex, const char *name, const char *type, int opts);
 extern void(*mtx_lock_spin_flags)(struct mtx *mutex, int flags);
@@ -68,6 +73,9 @@ extern void **kernel_map;
 extern void **prison0;
 extern void **rootvnode;
 extern void **allproc;
+// The sx that guards allproc. NULL on firmwares whose offset is not mapped,
+// in which case the walks stay unlocked exactly as they were before.
+extern struct sx *allproc_lock;
 extern struct sysent *sysents;
 
 extern uint64_t get_kbase();
